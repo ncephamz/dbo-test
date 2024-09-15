@@ -2,7 +2,7 @@
 - This project created for test from DBO and build with gonic, postgres, and docker
 
 # ERD
-- Please click this link `https://drive.google.com/file/d/1wbxBGevLXqXG_Hu9VLQIccy6PkH0vw10/view?usp=sharing`
+- Please click this link https://drive.google.com/file/d/1wbxBGevLXqXG_Hu9VLQIccy6PkH0vw10/view?usp=sharing
 
 # Doc API
 - Please click this link https://documenter.getpostman.com/view/8144274/2sAXqp8PEd
@@ -14,11 +14,13 @@
 - Create file .env in /dbo-test
   `touch .env`
 - Copy env variable needed, example : <br>
-  `SECRET_JWT=<your stein jwt secret>`<br>
-  `STEIN_HQ_URL = <your stein hq url>`<br>
-  `STEIN_HQ_USERNAME = <your stein hq username>`<br>
-  `STEIN_HQ_PASSWORD = <your stein hq password>`<br>
-  `CURRENCY_API_KEY = <your currency api key>`
+  `SECRET_JWT=<your jwt secret>`<br>
+  `POSTGRES_DSN=<your database DSN>`<br>
+  `POSTGRES_MAX_IDLE_CONNS=<max idle connection database>`<br>
+  `POSTGRES_OPEN_CONNS=<open connection database>`<br>
+  `PORT=<port apps>`<br>
+  `ALLOW_CORS=<domain allow cors>`
+
 - Build image and run container
   `docker-compose up -d`
 
