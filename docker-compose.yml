@@ -13,6 +13,14 @@ services:
     expose:
       - 5431
 
+  migrate:
+    image: migrate/migrate
+    command: ["-path", "/migrations", "-database",  "postgres://dbo_test:dboS3cR3t@dbo-database:5432/dbo_db?sslmode=disable", "up"]
+    links: 
+      - dbo-database
+    depends_on:
+      - dbo-database
+
   dbo-server:
     container_name: go_dbo_test
     build: .
