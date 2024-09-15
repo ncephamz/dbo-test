@@ -1,0 +1,22 @@
+version: '3'
+services:
+  dbo-database: 
+    image: postgres:14-alpine
+    ports:
+      - 5431:5432
+    volumes:
+      - ~/apps/postgres:/var/lib/postgresql-dbo/data
+    environment:
+      - POSTGRES_PASSWORD=dboS3cR3t
+      - POSTGRES_USER=dbo_test
+      - POSTGRES_DB=dbo_db
+    expose:
+      - 5431
+
+  dbo-server:
+    container_name: go_dbo_test
+    build: .
+    ports: 
+      - 8080:8080
+    restart: on-failure
+
