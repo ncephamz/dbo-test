@@ -1,34 +1,55 @@
 package api
 
 import (
-	"fmt"
 	"log"
-	"os"
+	"net/http"
 
-	"github.com/joho/godotenv"
-	"github.com/ncephamz/efishery-be-test/api/controllers"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"github.com/ncephamz/efishery-be-test/api/config"
+	"github.com/ncephamz/efishery-be-test/api/controllers/admin"
+	"github.com/ncephamz/efishery-be-test/api/pkg/database"
+	"github.com/ncephamz/efishery-be-test/api/pkg/middlewares"
 )
 
-var server = controllers.Server{}
+var (
+	server               *gin.Engine
+	AdminController      admin.AdminController
+	AdminRouteController admin.AdminRouteController
+)
 
 func init() {
-	if err := godotenv.Load(); err != nil {
-		log.Print("sad .env file found")
+	config := config.LoadConfig()
+
+	DB, err := database.ConnectDB(config)
+	if err != nil {
+		log.Fatal(err)
 	}
+
+	jwt := middlewares.Jwt{Secret: config.JwtSecret}
+
+	AdminController = admin.NewAdminController(DB, jwt)
+	AdminRouteController = admin.NewAdminRouteController(AdminController)
+
+	server = gin.Default()
 }
 
 func Run() {
+	config := config.LoadConfig()
 
-	var err error
-	err = godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error getting env, %v", err)
-	} else {
-		fmt.Println("We are getting the env values")
-	}
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowOrigins = config.AllowCors
+	corsConfig.AllowCredentials = true
 
-	server.Initialize(os.Getenv("STEIN_HQ_URL"), os.Getenv("STEIN_HQ_USERNAME"), os.Getenv("STEIN_HQ_PASSWORD"))
+	server.Use(cors.New(corsConfig))
 
-	server.Run(":8080")
+	router := server.Group("/api")
+	router.GET("/healthchecker", func(ctx *gin.Context) {
+		message := "Welcome to Golang with Gorm and Postgres"
+		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": message})
+	})
 
+	AdminRouteController.AdminRoute(router)
+
+	log.Fatal(server.Run(":" + config.Port))
 }
