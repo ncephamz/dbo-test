@@ -6,16 +6,20 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/ncephamz/efishery-be-test/api/config"
-	"github.com/ncephamz/efishery-be-test/api/controllers/admin"
-	"github.com/ncephamz/efishery-be-test/api/pkg/database"
-	"github.com/ncephamz/efishery-be-test/api/pkg/middlewares"
+	"github.com/ncephamz/dbo-test/api/config"
+	"github.com/ncephamz/dbo-test/api/controllers/admin"
+	"github.com/ncephamz/dbo-test/api/controllers/customer"
+	"github.com/ncephamz/dbo-test/api/pkg/database"
+	"github.com/ncephamz/dbo-test/api/pkg/middlewares"
 )
 
 var (
 	server               *gin.Engine
 	AdminController      admin.AdminController
 	AdminRouteController admin.AdminRouteController
+
+	CustomerContoller      customer.Controller
+	CustomerRouteContoller customer.RouteController
 )
 
 func init() {
@@ -27,9 +31,13 @@ func init() {
 	}
 
 	jwt := middlewares.Jwt{Secret: config.JwtSecret}
+	middleware := middlewares.NewMiddleware(jwt, DB)
 
 	AdminController = admin.NewAdminController(DB, jwt)
 	AdminRouteController = admin.NewAdminRouteController(AdminController)
+
+	CustomerContoller = customer.NewController(DB)
+	CustomerRouteContoller = customer.NewRouteController(CustomerContoller, middleware)
 
 	server = gin.Default()
 }
@@ -50,6 +58,7 @@ func Run() {
 	})
 
 	AdminRouteController.AdminRoute(router)
+	CustomerRouteContoller.Route(router)
 
 	log.Fatal(server.Run(":" + config.Port))
 }

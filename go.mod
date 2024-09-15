@@ -1,4 +1,4 @@
-module github.com/ncephamz/efishery-be-test
+module github.com/ncephamz/dbo-test
 
 go 1.13
 

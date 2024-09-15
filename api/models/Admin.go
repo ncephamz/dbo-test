@@ -11,14 +11,16 @@ type (
 		Password  string    `gorm:"not null"`
 		Name      string    `gorm:"type:varchar(50);not null"`
 		Email     string    `gorm:"type:varchar(100);not null"`
+		LastLogin string    `gorm:"null"`
+		Token     string    `gorm:"null"`
 		CreatedAt time.Time `gorm:"not null"`
-		UpdatedAt time.Time `gorm:"not null"`
-		DeletedAt string    `gorm:"not null"`
+		UpdatedAt time.Time `gorm:"null"`
+		DeletedAt string    `gorm:"null"`
 	}
 
 	AdminLogin struct {
-		Username string `json:"username"  validate:"required"`
-		Password string `json:"password"  validate:"required"`
+		Username string `json:"username"  binding:"required"`
+		Password string `json:"password"  binding:"required"`
 	}
 
 	AdminLoginResponse struct {

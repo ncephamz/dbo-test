@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/ncephamz/efishery-be-test/api/config"
+	"github.com/ncephamz/dbo-test/api/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

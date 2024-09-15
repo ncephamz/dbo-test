@@ -5,7 +5,7 @@
 - Please click this link `https://drive.google.com/file/d/1wbxBGevLXqXG_Hu9VLQIccy6PkH0vw10/view?usp=sharing`
 
 # Doc API
-- Please click this link 
+- Please click this link https://documenter.getpostman.com/view/8144274/2sAXqp8PEd
 
 # Requirment
 - Docker

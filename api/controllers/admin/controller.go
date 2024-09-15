@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ncephamz/efishery-be-test/api/models"
-	utils "github.com/ncephamz/efishery-be-test/api/pkg"
-	"github.com/ncephamz/efishery-be-test/api/pkg/middlewares"
+	"github.com/ncephamz/dbo-test/api/models"
+	utils "github.com/ncephamz/dbo-test/api/pkg"
+	"github.com/ncephamz/dbo-test/api/pkg/middlewares"
 	"gorm.io/gorm"
 )
 
@@ -38,20 +38,25 @@ func (ac *AdminController) Login(ctx *gin.Context) {
 	var admin models.Admin
 	result := ac.DB.First(&admin, "username = ?", strings.ToLower(payload.Username))
 	if result.Error != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid email or Password"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid Username or Password"})
 		return
 	}
 
 	if err := utils.VerifyPassword(admin.Password, payload.Password); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid email or Password"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Invalid Username or Password"})
 		return
 	}
 
 	duration := time.Now().Add(time.Hour * 24).Unix()
 
-	token, err := ac.Jwt.Signed(admin, duration)
+	token, err := ac.Jwt.Signed(admin.Id, duration)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	if err := ac.DB.Model(&admin).Updates(map[string]interface{}{"token": token, "last_login": time.Now()}).Error; err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Failed generate token"})
 		return
 	}
 

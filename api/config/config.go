@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/joho/godotenv"
-	utils "github.com/ncephamz/efishery-be-test/api/pkg"
+	utils "github.com/ncephamz/dbo-test/api/pkg"
 )
 
 type (

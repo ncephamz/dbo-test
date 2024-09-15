@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/ncephamz/efishery-be-test/api"
+	"github.com/ncephamz/dbo-test/api"
 )
 
 func main() {

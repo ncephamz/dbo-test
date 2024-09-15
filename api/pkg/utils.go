@@ -16,6 +16,10 @@ func StringToInt(value string) int {
 	return int(i)
 }
 
+func IntToString(value uint64) string {
+	return strconv.FormatUint(uint64(value), 10)
+}
+
 func HashPassword(password string) (string, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
