@@ -24,4 +24,5 @@ func (r *RouteController) Route(rg *gin.RouterGroup) {
 	router := rg.Group("orders")
 
 	router.POST("/cart", r.middleware.Validate(), r.controller.AddToCart)
+	router.GET("", r.middleware.Validate(), r.controller.GetOrders)
 }
