@@ -17,8 +17,8 @@ import (
 
 var (
 	server               *gin.Engine
-	AdminController      admin.AdminController
-	AdminRouteController admin.AdminRouteController
+	AdminController      admin.Controller
+	AdminRouteController admin.RouteController
 
 	CustomerContoller      customer.Controller
 	CustomerRouteContoller customer.RouteController
@@ -41,8 +41,8 @@ func init() {
 	jwt := middlewares.Jwt{Secret: config.JwtSecret}
 	middleware := middlewares.NewMiddleware(jwt, DB)
 
-	AdminController = admin.NewAdminController(DB, jwt)
-	AdminRouteController = admin.NewAdminRouteController(AdminController)
+	AdminController = admin.NewController(DB, jwt)
+	AdminRouteController = admin.NewRouteController(AdminController, middleware)
 
 	CustomerContoller = customer.NewController(DB)
 	CustomerRouteContoller = customer.NewRouteController(CustomerContoller, middleware)

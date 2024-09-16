@@ -12,22 +12,22 @@ import (
 	"gorm.io/gorm"
 )
 
-type AdminController struct {
+type Controller struct {
 	DB  *gorm.DB
 	Jwt middlewares.Jwt
 }
 
-func NewAdminController(
+func NewController(
 	DB *gorm.DB,
 	jwt middlewares.Jwt,
-) AdminController {
-	return AdminController{
+) Controller {
+	return Controller{
 		DB:  DB,
 		Jwt: jwt,
 	}
 }
 
-func (ac *AdminController) Login(ctx *gin.Context) {
+func (ac *Controller) Login(ctx *gin.Context) {
 	var payload *models.AdminLogin
 
 	if err := ctx.ShouldBindJSON(&payload); err != nil {
@@ -61,4 +61,9 @@ func (ac *AdminController) Login(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": models.AdminLoginResponse{Token: token, ExpiredAt: time.Duration(duration)}})
+}
+
+func (ac *Controller) GetProfile(ctx *gin.Context) {
+	claims, _:= ctx.Get("admin")
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": claims})
 }
