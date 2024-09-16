@@ -18,6 +18,11 @@ type (
 		UpdatedAt    time.Time `gorm:"null"`
 	}
 
+	CustomerAssosiationToAddress struct {
+		Customer
+		Address CustomerAddress `gorm:"foreignkey:customer_id;references:id"`
+	}
+
 	RequestCreateCustomer struct {
 		PhoneNumber  string                       `json:"phone_number" binding:"required"`
 		Email        string                       `json:"email" binding:"required"`
@@ -34,7 +39,21 @@ type (
 		Name         string `json:"name"`
 		PhotoProfile string `json:"photo_profile"`
 	}
+
+	ResponseDetailCustomer struct {
+		Id           string                       `json:"id"`
+		PhoneNumber  string                       `json:"phone_number"`
+		Email        string                       `json:"email"`
+		Name         string                       `json:"name"`
+		PhotoProfile string                       `json:"photo_profile"`
+		CreatedAt    time.Time                    `json:"created_at"`
+		Address      RequestCreateCustomerAddress `json:"address"`
+	}
 )
+
+func (CustomerAssosiationToAddress) TableName() string {
+	return "customers"
+}
 
 func (c Customer) ToResponse() ResponseGetAllCustomer {
 	return ResponseGetAllCustomer{
@@ -46,12 +65,19 @@ func (c Customer) ToResponse() ResponseGetAllCustomer {
 	}
 }
 
-func (req RequestCreateCustomer) ToModel() Customer {
-	now := time.Now()
-	password, _ := utils.HashPassword(req.Password)
+func (req RequestCreateCustomer) ToModel(id string) Customer {
+	var (
+		now         = time.Now()
+		password, _ = utils.HashPassword(req.Password)
+		newId       = utils.GenerateID()
+	)
+
+	if id != "" {
+		newId = utils.StringToUint64(id)
+	}
 
 	return Customer{
-		Id:           utils.GenerateID(),
+		Id:           newId,
 		PhoneNumber:  req.PhoneNumber,
 		Email:        req.Email,
 		Name:         req.Name,
@@ -59,5 +85,30 @@ func (req RequestCreateCustomer) ToModel() Customer {
 		Password:     password,
 		CreatedAt:    now,
 		UpdatedAt:    now,
+	}
+}
+
+func (c CustomerAssosiationToAddress) ToResponseDetail() ResponseDetailCustomer {
+	address := RequestCreateCustomerAddress{
+		Id:          utils.IntToString(c.Address.Id),
+		Province:    c.Address.Province,
+		City:        c.Address.City,
+		District:    c.Address.District,
+		SubDistrict: c.Address.SubDistrict,
+		Zipcode:     c.Address.Zipcode,
+		Address:     c.Address.Address,
+		Note:        c.Address.Note,
+		GoogleMap:   c.Address.GoogleMap,
+		IsMain:      c.Address.IsMain,
+	}
+
+	return ResponseDetailCustomer{
+		Id:           utils.IntToString(c.Customer.Id),
+		PhoneNumber:  c.Customer.PhoneNumber,
+		Email:        c.Customer.Email,
+		Name:         c.Customer.Name,
+		PhotoProfile: c.Customer.PhotoProfile,
+		Address:      address,
+		CreatedAt:    c.Customer.CreatedAt,
 	}
 }

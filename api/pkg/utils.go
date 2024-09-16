@@ -18,6 +18,15 @@ func StringToInt(value string) int {
 	return int(i)
 }
 
+func StringToUint64(value string) uint64 {
+	i, err := strconv.ParseUint(value, 10, 64)
+	if err != nil {
+		return 0
+	}
+
+	return i
+}
+
 func IntToString(value uint64) string {
 	return strconv.FormatUint(uint64(value), 10)
 }

@@ -57,8 +57,9 @@ func Run() {
 		ctx.JSON(http.StatusOK, gin.H{"status": "success", "message": message})
 	})
 
-	AdminRouteController.AdminRoute(router)
-	CustomerRouteContoller.Route(router)
+	v1 := router.Group("/v1")
+	AdminRouteController.AdminRoute(v1)
+	CustomerRouteContoller.Route(v1)
 
 	log.Fatal(server.Run(":" + config.Port))
 }

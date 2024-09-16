@@ -32,19 +32,21 @@ func (c *Controller) GetCustomers(ctx *gin.Context) {
 		customers []models.Customer
 		result    []models.ResponseGetAllCustomer
 		count     int64
+		db        = c.DB
 	)
 
 	if keyword != "" {
-		c.DB.Where("name ILIKE ?", fmt.Sprintf("%s%s%s", "%", keyword, "%"))
+		keyword = fmt.Sprintf("%s%s%s", "%", keyword, "%")
+		db = db.Where("(name ILIKE ? OR email ILIKE ? OR phone_number ILIKE ?)", keyword, keyword, keyword)
 	}
 
-	results := c.DB.Limit(limit).Offset(offset).Order("name").Find(&customers)
+	results := db.Limit(limit).Offset(offset).Order("name").Find(&customers)
 	if results.Error != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
 		return
 	}
 
-	results = c.DB.Model(&models.Customer{}).Count(&count)
+	results = db.Model(&models.Customer{}).Count(&count)
 	if results.Error != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": results.Error})
 		return
@@ -64,7 +66,7 @@ func (c *Controller) CreateCustomers(ctx *gin.Context) {
 		return
 	}
 
-	customer := payload.ToModel()
+	customer := payload.ToModel("")
 	customerAddress := payload.Address.ToModel(customer.Id)
 	tx := c.DB.Begin()
 
@@ -91,4 +93,58 @@ func (c *Controller) CreateCustomers(ctx *gin.Context) {
 	tx.Commit()
 
 	ctx.JSON(http.StatusCreated, gin.H{"status": "success"})
+}
+
+func (c *Controller) UpdateCustomers(ctx *gin.Context) {
+	var payload *models.RequestCreateCustomer
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	var (
+		id              = ctx.Param("id")
+		customer        = payload.ToModel(id)
+		customerAddress = payload.Address.ToModel(customer.Id)
+		tx              = c.DB.Begin()
+	)
+
+	result := tx.Updates(&customer)
+	if result.Error != nil {
+		tx.Rollback()
+
+		if strings.Contains(result.Error.Error(), "duplicate key") {
+			ctx.JSON(http.StatusConflict, gin.H{"status": "fail", "message": "Customer with that phone number already exists"})
+			return
+		}
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": result.Error.Error()})
+		return
+	}
+
+	result = tx.Updates(&customerAddress)
+	if result.Error != nil {
+		tx.Rollback()
+
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": result.Error.Error()})
+		return
+	}
+
+	tx.Commit()
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success"})
+}
+
+func (c *Controller) GetDetailCustomers(ctx *gin.Context) {
+	var (
+		id             = ctx.Param("id")
+		detailCustomer = models.CustomerAssosiationToAddress{}
+	)
+
+	result := c.DB.Preload("Address").Find(&detailCustomer, "id = ?", id)
+	if result.Error != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": result.Error.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": detailCustomer.ToResponseDetail()})
 }

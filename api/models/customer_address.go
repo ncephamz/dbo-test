@@ -24,6 +24,7 @@ type (
 	}
 
 	RequestCreateCustomerAddress struct {
+		Id          string `json:"id"`
 		Province    string `json:"province" binding:"required"`
 		City        string `json:"city" binding:"required"`
 		District    string `json:"district" binding:"required"`
@@ -41,10 +42,17 @@ func (CustomerAddress) TableName() string {
 }
 
 func (req RequestCreateCustomerAddress) ToModel(customerId uint64) CustomerAddress {
-	now := time.Now()
+	var (
+		now   = time.Now()
+		newId = utils.GenerateID()
+	)
+
+	if req.Id != "" {
+		newId = utils.StringToUint64(req.Id)
+	}
 
 	return CustomerAddress{
-		Id:          utils.GenerateID(),
+		Id:          newId,
 		CustomerId:  customerId,
 		Province:    req.Province,
 		City:        req.City,
