@@ -27,4 +27,5 @@ func (r *RouteController) Route(rg *gin.RouterGroup) {
 	router.GET("", r.middleware.Validate(), r.controller.GetOrders)
 	router.PATCH("/:id/:status", r.middleware.Validate(), r.controller.UpdateStatus)
 	router.DELETE("/:id", r.middleware.Validate(), r.controller.Delete)
+	router.GET("/:id", r.middleware.Validate(), r.controller.GetDetailOrder)
 }

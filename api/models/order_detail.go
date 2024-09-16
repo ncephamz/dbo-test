@@ -17,7 +17,24 @@ type (
 		CreatedAt        time.Time `gorm:"not null"`
 		UpdatedAt        time.Time `gorm:"null"`
 	}
+
+	OrderDetailAssosiationToProducts struct {
+		OrdersDetails
+		Products StoreWarehouseAssosiationToProduct `gorm:"foreignkey:store_warehouse_id;references:id"`
+	}
+
+	ResponseOrderDetail struct {
+		ProductName string  `json:"product_name"`
+		Image       string  `json:"image"`
+		Qty         int     `json:"qty"`
+		Price       float32 `json:"price"`
+		SubTotal    float32 `json:"sub_total"`
+	}
 )
+
+func (OrderDetailAssosiationToProducts) TableName() string {
+	return "orders_details"
+}
 
 func ToModelOrderDetail(orderId, storeWarehouseId uint64, qty int) OrdersDetails {
 	return OrdersDetails{

@@ -44,3 +44,18 @@ func (c *Controller) GetOrders(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": response, "count": utils.IntToString(uint64(count))})
 }
+
+func (c *Controller) GetDetailOrder(ctx *gin.Context) {
+	var (
+		id    = ctx.Param("id")
+		order models.OrderDetailAssosiation
+	)
+
+	result := c.DB.Preload("Customer").Preload("CustomerAddress").Preload("Details").Find(&order, "id = ?", id)
+	if result.Error != nil {
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": result.Error.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": order.ToResponse()})
+}
