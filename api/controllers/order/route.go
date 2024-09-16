@@ -25,4 +25,6 @@ func (r *RouteController) Route(rg *gin.RouterGroup) {
 
 	router.POST("/cart", r.middleware.Validate(), r.controller.AddToCart)
 	router.GET("", r.middleware.Validate(), r.controller.GetOrders)
+	router.PATCH("/:id/:status", r.middleware.Validate(), r.controller.UpdateStatus)
+	router.DELETE("/:id", r.middleware.Validate(), r.controller.Delete)
 }
