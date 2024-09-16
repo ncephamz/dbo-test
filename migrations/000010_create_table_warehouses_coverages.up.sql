@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS warehouses_coverages (
     district VARCHAR(50) NOT NULL,
     sub_district VARCHAR(50) NOT NULL,
     zipcode VARCHAR(6) NOT NULL,
+    tax NUMERIC(10, 3) NOT NULL,
     delivery_fee NUMERIC(10, 3) NOT NULL,
     service_fee NUMERIC(10, 3) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT now(),
