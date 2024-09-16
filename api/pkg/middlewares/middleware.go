@@ -54,6 +54,7 @@ func (m Middleware) Validate() gin.HandlerFunc {
 		}
 
 		ctx.Set("admin", admin)
+		ctx.Set("id", claims["id"])
 		ctx.Next()
 	}
 }

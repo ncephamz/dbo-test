@@ -64,6 +64,17 @@ func (ac *Controller) Login(ctx *gin.Context) {
 }
 
 func (ac *Controller) GetProfile(ctx *gin.Context) {
-	claims, _:= ctx.Get("admin")
+	claims, _ := ctx.Get("admin")
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": claims})
+}
+
+func (ac *Controller) Logout(ctx *gin.Context) {
+	id, _ := ctx.Get("id")
+
+	if err := ac.DB.Model(&models.Admin{}).Where("id = ?", id).Update("token", nil).Error; err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": "Failed logout"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success"})
 }

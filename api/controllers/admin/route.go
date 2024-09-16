@@ -25,4 +25,5 @@ func (rc *RouteController) AdminRoute(rg *gin.RouterGroup) {
 
 	router.POST("/login", rc.controller.Login)
 	router.GET("/profile", rc.middleware.Validate(), rc.controller.GetProfile)
+	router.POST("/logout", rc.middleware.Validate(), rc.controller.Logout)
 }
