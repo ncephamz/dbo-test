@@ -4,10 +4,12 @@ import (
 	"time"
 
 	utils "github.com/ncephamz/dbo-test/api/pkg"
+	"gorm.io/gorm"
 )
 
 type (
 	Customer struct {
+		gorm.Model
 		Id           uint64    `gorm:"primary_key"`
 		PhoneNumber  string    `gorm:"type:varchar(14);not null"`
 		Email        string    `gorm:"type:varchar(100);not null"`

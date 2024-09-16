@@ -148,3 +148,28 @@ func (c *Controller) GetDetailCustomers(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": detailCustomer.ToResponseDetail()})
 }
+
+func (c *Controller) DeleteCustomers(ctx *gin.Context) {
+	var (
+		id = utils.StringToUint64(ctx.Param("id"))
+		tx = c.DB.Begin()
+	)
+
+	result := tx.Delete(&models.Customer{Id: id})
+	if result.Error != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": result.Error.Error()})
+		return
+	}
+
+	result = tx.Delete(&models.CustomerAddress{}, "customer_id = ?", id)
+	if result.Error != nil {
+		tx.Rollback()
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": result.Error.Error()})
+		return
+	}
+
+	tx.Commit()
+
+	ctx.JSON(http.StatusOK, gin.H{"status": "success"})
+}

@@ -27,4 +27,5 @@ func (r *RouteController) Route(rg *gin.RouterGroup) {
 	router.POST("", r.middleware.Validate(), r.controller.CreateCustomers)
 	router.PUT("/:id", r.middleware.Validate(), r.controller.UpdateCustomers)
 	router.GET("/:id", r.middleware.Validate(), r.controller.GetDetailCustomers)
+	router.DELETE("/:id", r.middleware.Validate(), r.controller.DeleteCustomers)
 }
