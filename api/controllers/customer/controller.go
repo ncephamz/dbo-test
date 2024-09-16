@@ -3,6 +3,7 @@ package customer
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ncephamz/dbo-test/api/models"
@@ -54,4 +55,40 @@ func (c *Controller) GetCustomers(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"status": "success", "data": result, "count": utils.IntToString(uint64(count))})
+}
+
+func (c *Controller) CreateCustomers(ctx *gin.Context) {
+	var payload *models.RequestCreateCustomer
+	if err := ctx.ShouldBindJSON(&payload); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"status": "fail", "message": err.Error()})
+		return
+	}
+
+	customer := payload.ToModel()
+	customerAddress := payload.Address.ToModel(customer.Id)
+	tx := c.DB.Begin()
+
+	result := tx.Create(&customer)
+	if result.Error != nil {
+		tx.Rollback()
+
+		if strings.Contains(result.Error.Error(), "duplicate key") {
+			ctx.JSON(http.StatusConflict, gin.H{"status": "fail", "message": "Customer with that phone number already exists"})
+			return
+		}
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": result.Error.Error()})
+		return
+	}
+
+	result = tx.Create(&customerAddress)
+	if result.Error != nil {
+		tx.Rollback()
+
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "error", "message": result.Error.Error()})
+		return
+	}
+
+	tx.Commit()
+
+	ctx.JSON(http.StatusCreated, gin.H{"status": "success"})
 }

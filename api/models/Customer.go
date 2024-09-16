@@ -16,7 +16,15 @@ type (
 		PhotoProfile string    `gorm:"type:varchar(225);null"`
 		CreatedAt    time.Time `gorm:"not null"`
 		UpdatedAt    time.Time `gorm:"null"`
-		DeletedAt    string    `gorm:"null"`
+	}
+
+	RequestCreateCustomer struct {
+		PhoneNumber  string                       `json:"phone_number" binding:"required"`
+		Email        string                       `json:"email" binding:"required"`
+		Password     string                       `json:"password" binding:"required"`
+		Name         string                       `json:"name" binding:"required"`
+		PhotoProfile string                       `json:"photo_profile"`
+		Address      RequestCreateCustomerAddress `json:"address" binding:"required"`
 	}
 
 	ResponseGetAllCustomer struct {
@@ -35,5 +43,21 @@ func (c Customer) ToResponse() ResponseGetAllCustomer {
 		Email:        c.Email,
 		Name:         c.Name,
 		PhotoProfile: c.PhotoProfile,
+	}
+}
+
+func (req RequestCreateCustomer) ToModel() Customer {
+	now := time.Now()
+	password, _ := utils.HashPassword(req.Password)
+
+	return Customer{
+		Id:           utils.GenerateID(),
+		PhoneNumber:  req.PhoneNumber,
+		Email:        req.Email,
+		Name:         req.Name,
+		PhotoProfile: req.PhotoProfile,
+		Password:     password,
+		CreatedAt:    now,
+		UpdatedAt:    now,
 	}
 }

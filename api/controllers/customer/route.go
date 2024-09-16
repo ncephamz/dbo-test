@@ -24,4 +24,5 @@ func (r *RouteController) Route(rg *gin.RouterGroup) {
 	router := rg.Group("customers")
 
 	router.GET("", r.middleware.Validate(), r.controller.GetCustomers)
+	router.POST("", r.middleware.Validate(), r.controller.CreateCustomers)
 }

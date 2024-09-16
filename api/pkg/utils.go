@@ -2,7 +2,9 @@ package utils
 
 import (
 	"fmt"
+	"math/rand"
 	"strconv"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -31,4 +33,8 @@ func HashPassword(password string) (string, error) {
 
 func VerifyPassword(hashedPassword string, candidatePassword string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(candidatePassword))
+}
+
+func GenerateID() uint64 {
+	return uint64((time.Now().UnixNano() + int64(rand.Intn(100))))
 }
