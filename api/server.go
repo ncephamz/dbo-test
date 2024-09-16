@@ -9,6 +9,7 @@ import (
 	"github.com/ncephamz/dbo-test/api/config"
 	"github.com/ncephamz/dbo-test/api/controllers/admin"
 	"github.com/ncephamz/dbo-test/api/controllers/customer"
+	"github.com/ncephamz/dbo-test/api/controllers/order"
 	"github.com/ncephamz/dbo-test/api/controllers/product"
 	"github.com/ncephamz/dbo-test/api/pkg/database"
 	"github.com/ncephamz/dbo-test/api/pkg/middlewares"
@@ -24,6 +25,9 @@ var (
 
 	ProductController      product.Controller
 	ProductRouteController product.RouteController
+
+	OrderConstroller     order.Controller
+	OrderRouteController order.RouteController
 )
 
 func init() {
@@ -45,6 +49,9 @@ func init() {
 
 	ProductController = product.NewController(DB)
 	ProductRouteController = product.NewRouteController(ProductController, middleware)
+
+	OrderConstroller = order.NewController(DB)
+	OrderRouteController = order.NewRouteController(OrderConstroller, middleware)
 
 	server = gin.Default()
 }
@@ -68,6 +75,7 @@ func Run() {
 	AdminRouteController.AdminRoute(v1)
 	CustomerRouteContoller.Route(v1)
 	ProductRouteController.Route(v1)
+	OrderRouteController.Route(v1)
 
 	log.Fatal(server.Run(":" + config.Port))
 }

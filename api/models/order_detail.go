@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	utils "github.com/ncephamz/dbo-test/api/pkg"
 	"gorm.io/gorm"
 )
 
@@ -17,3 +18,13 @@ type (
 		UpdatedAt        time.Time `gorm:"null"`
 	}
 )
+
+func ToModelOrderDetail(orderId, storeWarehouseId uint64, qty int) OrdersDetails {
+	return OrdersDetails{
+		Id:               utils.GenerateID(),
+		OrderId:          orderId,
+		StoreWarehouseId: storeWarehouseId,
+		Qty:              qty,
+		CreatedAt:        time.Now(),
+	}
+}

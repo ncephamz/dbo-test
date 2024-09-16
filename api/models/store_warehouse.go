@@ -18,4 +18,13 @@ type (
 		CreatedAt   time.Time `gorm:"not null"`
 		UpdatedAt   time.Time `gorm:"null"`
 	}
+
+	StoreWarehouseAssosiationToWareHouseCoverage struct {
+		StoresWarehouses
+		Coverage WarehousesCoverages `gorm:"foreignkey:warehouse_id;references:id"`
+	}
 )
+
+func (StoreWarehouseAssosiationToWareHouseCoverage) TableName() string {
+	return "stores_warehouses"
+}
